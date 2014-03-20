@@ -12,6 +12,7 @@ A program to capture GPS coordinates from tweets and plot them on a map.
 
 #### Dependencies
 * python 2.7
+* Users tweeting with location enabled
 
 
 ######Screenshot
