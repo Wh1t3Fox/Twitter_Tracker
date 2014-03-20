@@ -20,7 +20,7 @@ class Listener(tweepy.StreamListener):
 
         #Try to add the coords to the map
         try:
-            gmap.addpoint(str(decoded['coordinates']['coordinates'][1]), str(decoded['coordinates']['coordinates'][0]), '#FF0000')
+            gmap.addpoint(float(decoded['coordinates']['coordinates'][1]), float(decoded['coordinates']['coordinates'][0]), '#FF0000')
         except:
             print "Lat: " + str(decoded['coordinates']['coordinates'][1])
             print "Lon: " + str(decoded['coordinates']['coordinates'][0])
@@ -50,6 +50,7 @@ if __name__ == "__main__":
         parser.add_argument('-t', '--topic', nargs='+', type=str, help="Hashtags to follow")
         args = vars(parser.parse_args())
 
+        #Convert screen name to the user id
         if args['user']:
             users = [str(tweepy.API(auth).get_user(x).id) for x in args['user']]
         else:
@@ -59,6 +60,7 @@ if __name__ == "__main__":
         else:
             topics = []
 
+        #Setup the Stream with the users/hashtags
         l = Listener()
         stream = tweepy.Stream(auth, l)
         stream.filter(follow=users, track=topics)
