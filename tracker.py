@@ -10,26 +10,29 @@ consumer_secret = ''
 access_token = ''
 access_token_secret = ''
 
+#Center the Map over Edmond, OK
 gmap = pygmaps.maps('35.6500', '-97.4667', 5)
 
-coords = []
-
+#Create a listener for the Streaming API
 class Listener(tweepy.StreamListener):
     def on_data(self, data):
         decoded = json.loads(data)
 
+        #Try to add the coords to the map
         try:
             gmap.addpoint(str(decoded['coordinates']['coordinates'][1]), str(decoded['coordinates']['coordinates'][0]), '#FF0000')
         except:
             print "Lat: " + str(decoded['coordinates']['coordinates'][1])
             print "Lon: " + str(decoded['coordinates']['coordinates'][0])
 
+        #Store the tweet in a file
         with open('tweets.txt', 'a+') as f:
             json.dump(decoded['text'].encode('ascii', 'ignore'), f)
         """
         print '@%s: %s' % (decoded['user']['screen_name'], decoded['text'].encode('ascii', 'ignore'))
         print ''
         """
+        #Create the Map
         gmap.draw('test.html')
         return True
 
