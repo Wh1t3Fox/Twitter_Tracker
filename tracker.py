@@ -5,37 +5,39 @@ import tweepy
 import json
 import argparse
 
+#Twitter Keys
 consumer_key = ''
 consumer_secret = ''
 access_token = ''
 access_token_secret = ''
 
-#Center the Map over Edmond, OK
+#Initialize the map
 gmap = pygmaps.maps('35.6500', '-97.4667', 5)
 
-#Create a listener for the Streaming API
+#Coords for drawing our lines on the map
+path = []
+
+#Listener to received the stream
 class Listener(tweepy.StreamListener):
+    
+    #Function is called on new tweet
     def on_data(self, data):
         decoded = json.loads(data)
-
-        #Try to add the coords to the map
-        try:
-            gmap.addpoint(float(decoded['coordinates']['coordinates'][1]), float(decoded['coordinates']['coordinates'][0]), '#FF0000')
-        except:
-            print "Lat: " + str(decoded['coordinates']['coordinates'][1])
-            print "Lon: " + str(decoded['coordinates']['coordinates'][0])
-
-        #Store the tweet in a file
-        with open('tweets.txt', 'a+') as f:
-            json.dump(decoded['text'].encode('ascii', 'ignore'), f)
-        """
+        
+        #Print the tweet
         print '@%s: %s' % (decoded['user']['screen_name'], decoded['text'].encode('ascii', 'ignore'))
         print ''
-        """
-        #Create the Map
-        gmap.draw('test.html')
+        
+        #If there coords, add them to the map
+        if decoded['coordinates'] != 'null':
+            path.append((float(decoded['coordinates']['coordinates'][1]), float(decoded['coordinates']['coordinates'][0])))
+            gmap.addpoint(float(decoded['coordinates']['coordinates'][1]), float(decoded['coordinates']['coordinates'][0]), '#FF0000', decoded['user']['screen_name'])
+            gmap.addpath(path, "#00FF00")
+            gmap.draw('test.html')
+        
         return True
-
+    
+    #If an error occurs
     def on_error(self, status):
         print status
 
@@ -44,13 +46,13 @@ if __name__ == "__main__":
     try:
         auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
         auth.set_access_token(access_token, access_token_secret)
-
+    
         parser = argparse.ArgumentParser(description="Track a User or Topic with GPS")
         parser.add_argument('-u', '--user', nargs='+', type=str, help="Twitter username")
         parser.add_argument('-t', '--topic', nargs='+', type=str, help="Hashtags to follow")
         args = vars(parser.parse_args())
-
-        #Convert screen name to the user id
+        
+        #If there are users to follow get their user id
         if args['user']:
             users = [str(tweepy.API(auth).get_user(x).id) for x in args['user']]
         else:
@@ -59,12 +61,12 @@ if __name__ == "__main__":
             topics = [x for x in args['topic']]
         else:
             topics = []
-
-        #Setup the Stream with the users/hashtags
+        
+        #Setup the stream with the arguments
         l = Listener()
         stream = tweepy.Stream(auth, l)
         stream.filter(follow=users, track=topics)
     except KeyboardInterrupt:
         print '\nGoodbye!'
-
-
+    
+    
