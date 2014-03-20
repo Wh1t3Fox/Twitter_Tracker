@@ -2,8 +2,6 @@ Twitter Tracker
 =========
 
 A program to capture GPS coordinates from tweets and plot them on a map.
-
-<br>
 <br>
 #Usage
     python tracker.py -u <usernames> -t <hashtags>
