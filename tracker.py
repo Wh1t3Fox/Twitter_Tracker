@@ -29,10 +29,15 @@ class Listener(tweepy.StreamListener):
         print ''
         
         #If there coords, add them to the map
-        if decoded['coordinates'] != 'null':
-            path.append((float(decoded['coordinates']['coordinates'][1]), float(decoded['coordinates']['coordinates'][0])))
-            gmap.addpoint(float(decoded['coordinates']['coordinates'][1]), float(decoded['coordinates']['coordinates'][0]), '#FF0000', decoded['user']['screen_name'])
-            gmap.addpath(path, "#00FF00")
+        if decoded['coordinates']:
+            #pop off the color in order to add more coords
+            try:
+                gmap.paths[0].pop(-1)
+            except:
+                pass
+            path.append((decoded['coordinates']['coordinates'][1], decoded['coordinates']['coordinates'][0]))
+            gmap.addpoint(float(decoded['coordinates']['coordinates'][1]), float(decoded['coordinates']['coordinates'][0]), '#FF0000', "@"+decoded['user']['screen_name'])
+            gmap.addpath(path, "#0000FF")
             gmap.draw('test.html')
         
         return True
