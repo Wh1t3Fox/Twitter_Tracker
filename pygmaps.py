@@ -29,8 +29,7 @@ class maps:
             self.drawmap(f)
             for point in  self.points:
                 self.drawpoint(f,point[0],point[1],point[2],point[3])
-            for path in self.paths:
-                self.drawPolyline(f,path[:-1], strokeColor = path[-1])
+            self.drawPolyline(f, self.paths)
             f.write('}\n')        
     
     #Draw the map
@@ -58,15 +57,10 @@ class maps:
         f.write('\n')
         
     #Add the line between points
-    def drawPolyline(self,f,path,\
-            clickable = False, \
-            geodesic = True,\
-            strokeColor = "#FF0000",\
-            strokeOpacity = 1.0,\
-            strokeWeight = 2
-            ):
+    def drawPolyline(self,f,path, clickable = False, geodesic = True,strokeColor = "#FF0000",strokeOpacity = 1.0, strokeWeight = 2):
+        print path
         f.write('\tvar PolylineCoordinates = [\n')
-        for coordinate in path:
+        for coordinate in path[0][:-1]:
             f.write('\t\tnew google.maps.LatLng(%f, %f),\n' % (coordinate[0],coordinate[1]))
         f.write('\t];\n')
         f.write('\n')
