@@ -36,7 +36,7 @@ class Listener(tweepy.StreamListener):
             except:
                 pass
             path.append((decoded['coordinates']['coordinates'][1], decoded['coordinates']['coordinates'][0]))
-            gmap.addpoint(float(decoded['coordinates']['coordinates'][1]), float(decoded['coordinates']['coordinates'][0]), '#FF0000', "@"+decoded['user']['screen_name'])
+            gmap.addpoint(decoded['coordinates']['coordinates'][1], decoded['coordinates']['coordinates'][0], '#FF0000', "@"+decoded['user']['screen_name'])
             gmap.addpath(path, "#0000FF")
             gmap.draw('test.html')
         
