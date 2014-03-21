@@ -1,8 +1,7 @@
-import math
 ###########################################################
 ## Google map python wrapper V0.1
-## https://code.google.com/p/pygmaps/
-##
+## Origin: https://code.google.com/p/pygmaps/
+## Modified by: Craig West
 ############################################################
 
 class maps:
@@ -10,30 +9,20 @@ class maps:
     def __init__(self, centerLat, centerLng, zoom ):
         self.center = (float(centerLat),float(centerLng))
         self.zoom = int(zoom)
-        self.grids = None
         self.paths = []
         self.points = []
-        self.radpoints = []
-        self.gridsetting = None
         self.coloricon = 'http://chart.apis.google.com/chart?cht=mm&chs=12x16&chco=FFFFFF,XXXXXX,000000&ext=.png'
 
-    def setgrids(self,slat,elat,latin,slng,elng,lngin):
-        self.gridsetting = [slat,elat,latin,slng,elng,lngin]
-
+    #Add a point to the list
     def addpoint(self, lat, lng, color = '#FF0000', title = None):
         self.points.append((lat,lng,color[1:],title))
-
-    #def addpointcoord(self, coord):
-    #    self.points.append((coord[0],coord[1]))
-
-    def addradpoint(self, lat,lng,rad,color = '#0000FF'):
-        self.radpoints.append((lat,lng,rad,color))
-
+    
+    #Add a list of points to the path list
     def addpath(self,path,color = '#FF0000'):
         path.append(color)
         self.paths.append(path)
     
-    #create the html file which inlcude one google map and all points and paths
+    #Create the file
     def draw(self, htmlfile):
         with open(htmlfile,'w') as f:
             f.write('<html>\n')
@@ -45,8 +34,10 @@ class maps:
             f.write('<script type="text/javascript">\n')
             f.write('\tfunction initialize() {\n')
             self.drawmap(f)
-            self.drawpoints(f)
-            self.drawpaths(f,self.paths)
+            for point in  self.points:
+                self.drawpoint(f,point[0],point[1],point[2],point[3])
+            for path in self.paths:
+                self.drawPolyline(f,path[:-1], strokeColor = path[-1])
             f.write('\t}\n')
             f.write('</script>\n')
             f.write('</head>\n')
@@ -54,19 +45,8 @@ class maps:
             f.write('\t<div id="map_canvas" style="width: 100%; height: 100%;"></div>\n')
             f.write('</body>\n')
             f.write('</html>\n')        
-        
-    def drawpoints(self,f):
-        for point in  self.points:
-            self.drawpoint(f,point[0],point[1],point[2],point[3])
-
-    def drawpaths(self, f, paths):
-        for path in paths:
-            #print path
-            self.drawPolyline(f,path[:-1], strokeColor = path[-1])
-
-    #############################################
-    # # # # # # Low level Map Drawing # # # # # # 
-    #############################################
+    
+    #Draw the map
     def drawmap(self, f):
         f.write('\t\tvar centerlatlng = new google.maps.LatLng(%f, %f);\n' % (self.center[0],self.center[1]))
         f.write('\t\tvar myOptions = {\n')
@@ -76,9 +56,8 @@ class maps:
         f.write('\t\t};\n')
         f.write('\t\tvar map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);\n')
         f.write('\n')
-
-
-
+    
+    #Add the points to the map
     def drawpoint(self,f,lat,lon,color,title):
         f.write('\t\tvar latlng = new google.maps.LatLng(%f, %f);\n'%(lat,lon))
         f.write('\t\tvar img = new google.maps.MarkerImage(\'%s\');\n' % (self.coloricon.replace('XXXXXX',color)))
@@ -91,6 +70,7 @@ class maps:
         f.write('\t\tmarker.setMap(map);\n')
         f.write('\n')
         
+    #Add the line between points
     def drawPolyline(self,f,path,\
             clickable = False, \
             geodesic = True,\
