@@ -19,3 +19,4 @@ A Javascript file will be generated for the map using Google Maps API.
 
 ######Screenshot
 ![alt text](sampleImage.png "Sample Image")
+[View](https://secure.westcraig.com/tracker/ "Twitter Tracker")
