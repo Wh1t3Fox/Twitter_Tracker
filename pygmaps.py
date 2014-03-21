@@ -35,76 +35,29 @@ class maps:
     
     #create the html file which inlcude one google map and all points and paths
     def draw(self, htmlfile):
-        f = open(htmlfile,'w')
-        f.write('<html>\n')
-        f.write('<head>\n')
-        f.write('<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />\n')
-        f.write('<meta http-equiv="content-type" content="text/html; charset=UTF-8"/>\n')
-        f.write('<title>Google Maps - pygmaps </title>\n')
-        f.write('<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>\n')
-        f.write('<script type="text/javascript">\n')
-        f.write('\tfunction initialize() {\n')
-        self.drawmap(f)
-        self.drawgrids(f)
-        self.drawpoints(f)
-        self.drawradpoints(f)
-        self.drawpaths(f,self.paths)
-        f.write('\t}\n')
-        f.write('</script>\n')
-        f.write('</head>\n')
-        f.write('<body style="margin:0px; padding:0px;" onload="initialize()">\n')
-        f.write('\t<div id="map_canvas" style="width: 100%; height: 100%;"></div>\n')
-        f.write('</body>\n')
-        f.write('</html>\n')        
-        f.close()
-
-    def drawgrids(self, f):
-        if self.gridsetting == None:
-            return
-        slat = self.gridsetting[0]
-        elat = self.gridsetting[1]
-        latin = self.gridsetting[2]
-        slng = self.gridsetting[3]
-        elng = self.gridsetting[4]
-        lngin = self.gridsetting[5]
-        self.grids = []
-
-        r = [slat+float(x)*latin for x in range(0, int((elat-slat)/latin))]
-        for lat in r:
-            self.grids.append([(lat+latin/2.0,slng+lngin/2.0),(lat+latin/2.0,elng+lngin/2.0)])
-
-        r = [slng+float(x)*lngin for x in range(0, int((elng-slng)/lngin))]
-        for lng in r:
-            self.grids.append([(slat+latin/2.0,lng+lngin/2.0),(elat+latin/2.0,lng+lngin/2.0)])
+        with open(htmlfile,'w') as f:
+            f.write('<html>\n')
+            f.write('<head>\n')
+            f.write('<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />\n')
+            f.write('<meta http-equiv="content-type" content="text/html; charset=UTF-8"/>\n')
+            f.write('<title>Google Maps - pygmaps </title>\n')
+            f.write('<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>\n')
+            f.write('<script type="text/javascript">\n')
+            f.write('\tfunction initialize() {\n')
+            self.drawmap(f)
+            self.drawpoints(f)
+            self.drawpaths(f,self.paths)
+            f.write('\t}\n')
+            f.write('</script>\n')
+            f.write('</head>\n')
+            f.write('<body style="margin:0px; padding:0px;" onload="initialize()">\n')
+            f.write('\t<div id="map_canvas" style="width: 100%; height: 100%;"></div>\n')
+            f.write('</body>\n')
+            f.write('</html>\n')        
         
-        for line in self.grids:
-            self.drawPolyline(f,line,strokeColor = "#000000")
     def drawpoints(self,f):
         for point in  self.points:
             self.drawpoint(f,point[0],point[1],point[2],point[3])
-
-    def drawradpoints(self, f):
-        for rpoint in self.radpoints:
-            path = self.getcycle(rpoint[0:3])
-            self.drawPolygon(f,path,strokeColor = rpoint[3])
-
-    def getcycle(self,rpoint):
-        cycle = []
-        lat = rpoint[0]
-        lng = rpoint[1]
-        rad = rpoint[2] #unit: meter
-        d = (rad/1000.0)/6378.8;
-        lat1 = (math.pi/180.0)* lat
-        lng1 = (math.pi/180.0)* lng
-
-        r = [x*30 for x in range(12)]
-        for a in r:
-            tc = (math.pi/180.0)*a;
-            y = math.asin(math.sin(lat1)*math.cos(d)+math.cos(lat1)*math.sin(d)*math.cos(tc))
-            dlng = math.atan2(math.sin(tc)*math.sin(d)*math.cos(lat1),math.cos(d)-math.sin(lat1)*math.sin(y))
-            x = ((lng1-dlng+math.pi) % (2.0*math.pi)) - math.pi 
-            cycle.append( ( float(y*(180.0/math.pi)),float(x*(180.0/math.pi)) ) )
-        return cycle
 
     def drawpaths(self, f, paths):
         for path in paths:
@@ -145,56 +98,27 @@ class maps:
             strokeOpacity = 1.0,\
             strokeWeight = 2
             ):
-        f.write('var PolylineCoordinates = [\n')
+        f.write('\t\tvar PolylineCoordinates = [\n')
         for coordinate in path:
-            f.write('new google.maps.LatLng(%f, %f),\n' % (coordinate[0],coordinate[1]))
-        f.write('];\n')
+            f.write('\t\t\tnew google.maps.LatLng(%f, %f),\n' % (coordinate[0],coordinate[1]))
+        f.write('\t\t];\n')
         f.write('\n')
         
-        f.write('var lineSymbol = { \n')
-        f.write('path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW \n')
-        f.write('}; \n')
-        f.write('var Path = new google.maps.Polyline({\n')
-        f.write('clickable: %s,\n' % (str(clickable).lower()))
-        f.write('geodesic: %s,\n' % (str(geodesic).lower()))
-        f.write('path: PolylineCoordinates,\n')
-        f.write('icons: [{ \n')
-        f.write('icon: lineSymbol,\n')
-        f.write('offset: "100%"\n')
-        f.write('}],\n')
-        f.write('strokeColor: "%s",\n' %(strokeColor))
-        f.write('strokeOpacity: %f,\n' % (strokeOpacity))
-        f.write('strokeWeight: %d\n' % (strokeWeight))
-        f.write('});\n')
+        f.write('\t\tvar lineSymbol = { \n')
+        f.write('\t\t\tpath: google.maps.SymbolPath.FORWARD_CLOSED_ARROW \n')
+        f.write('\t\t}; \n')
+        f.write('\t\tvar Path = new google.maps.Polyline({\n')
+        f.write('\t\t\tclickable: %s,\n' % (str(clickable).lower()))
+        f.write('\t\t\tgeodesic: %s,\n' % (str(geodesic).lower()))
+        f.write('\t\t\tpath: PolylineCoordinates,\n')
+        f.write('\t\t\ticons: [{ \n')
+        f.write('\t\t\t\ticon: lineSymbol,\n')
+        f.write('\t\t\t\toffset: "100%"\n')
+        f.write('\t\t\t}],\n')
+        f.write('\t\t\tstrokeColor: "%s",\n' %(strokeColor))
+        f.write('\t\t\tstrokeOpacity: %f,\n' % (strokeOpacity))
+        f.write('\t\t\tstrokeWeight: %d\n' % (strokeWeight))
+        f.write('\t\t});\n')
         f.write('\n')
-        f.write('Path.setMap(map);\n')
-        f.write('\n\n')
-
-    def drawPolygon(self,f,path,\
-            clickable = False, \
-            geodesic = True,\
-            fillColor = "#000000",\
-            fillOpacity = 0.0,\
-            strokeColor = "#FF0000",\
-            strokeOpacity = 1.0,\
-            strokeWeight = 1
-            ):
-        f.write('var coords = [\n')
-        for coordinate in path:
-            f.write('new google.maps.LatLng(%f, %f),\n' % (coordinate[0],coordinate[1]))
-        f.write('];\n')
-        f.write('\n')
-
-        f.write('var polygon = new google.maps.Polygon({\n')
-        f.write('clickable: %s,\n' % (str(clickable).lower()))
-        f.write('geodesic: %s,\n' % (str(geodesic).lower()))
-        f.write('fillColor: "%s",\n' %(fillColor))
-        f.write('fillOpacity: %f,\n' % (fillOpacity))
-        f.write('paths: coords,\n')
-        f.write('strokeColor: "%s",\n' %(strokeColor))
-        f.write('strokeOpacity: %f,\n' % (strokeOpacity))
-        f.write('strokeWeight: %d\n' % (strokeWeight))
-        f.write('});\n')
-        f.write('\n')
-        f.write('polygon.setMap(map);\n')
+        f.write('\t\tPath.setMap(map);\n')
         f.write('\n\n')
