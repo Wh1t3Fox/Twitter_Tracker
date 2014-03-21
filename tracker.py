@@ -16,6 +16,7 @@ gmap = pygmaps.maps('35.6500', '-97.4667', 5)
 
 #Coords for drawing our lines on the map
 path = []
+legend = []
 
 #Listener to received the stream
 class Listener(tweepy.StreamListener):
@@ -36,9 +37,9 @@ class Listener(tweepy.StreamListener):
             except:
                 pass
             path.append((decoded['coordinates']['coordinates'][1], decoded['coordinates']['coordinates'][0]))
-            gmap.addpoint(decoded['coordinates']['coordinates'][1], decoded['coordinates']['coordinates'][0], '#FF0000', "@"+decoded['user']['screen_name'])
+            gmap.addpoint(float(decoded['coordinates']['coordinates'][1]), float(decoded['coordinates']['coordinates'][0]), '#FF0000', "@"+decoded['user']['screen_name'])
             gmap.addpath(path, "#0000FF")
-            gmap.draw()
+            gmap.draw(legend)
         
         return True
     
@@ -60,12 +61,15 @@ if __name__ == "__main__":
         #If there are users to follow get their user id
         if args['user']:
             users = [str(tweepy.API(auth).get_user(x).id) for x in args['user']]
+            [legend.append("@"+x) for x in args['user']]
         else:
             users = []
         if args['topic']:
             topics = [x for x in args['topic']]
+            [legend.append("#"+x) for x in args['topic']]
         else:
             topics = []
+
         
         #Setup the stream with the arguments
         l = Listener()
