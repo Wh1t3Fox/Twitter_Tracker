@@ -16,12 +16,12 @@ class maps:
     #Add a point to the list
     def addpoint(self, lat, lng, color = '#FF0000', title = None):
         self.points.append((lat,lng,color[1:],title))
-    
+
     #Add a list of points to the path list
     def addpath(self,path,color = '#FF0000'):
         path.append(color)
         self.paths.append(path)
-    
+
     #Create the file
     def draw(self):
         with open('map.js','w') as f:
@@ -30,8 +30,8 @@ class maps:
             for point in  self.points:
                 self.drawpoint(f,point[0],point[1],point[2],point[3])
             self.drawPolyline(f, self.paths)
-            f.write('}\n')        
-    
+            f.write('}\n')
+
     #Draw the map
     def drawmap(self, f):
         f.write('\tvar centerlatlng = new google.maps.LatLng(%f, %f);\n' % (self.center[0],self.center[1]))
@@ -42,7 +42,7 @@ class maps:
         f.write('\t};\n')
         f.write('\tvar map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);\n')
         f.write('\n')
-    
+
     #Add the points to the map
     def drawpoint(self,f,lat,lon,color,title):
         f.write('\tvar latlng = new google.maps.LatLng(%f, %f);\n'%(lat,lon))
@@ -55,16 +55,15 @@ class maps:
         f.write('\t});\n')
         f.write('\tmarker.setMap(map);\n')
         f.write('\n')
-        
+
     #Add the line between points
-    def drawPolyline(self,f,path, clickable = False, geodesic = True,strokeColor = "#FF0000",strokeOpacity = 1.0, strokeWeight = 2):
-        print path
+    def drawPolyline(self,f,path, clickable = False, geodesic = True,strokeColor = "#0000FF",strokeOpacity = 1.0, strokeWeight = 2):
         f.write('\tvar PolylineCoordinates = [\n')
         for coordinate in path[0][:-1]:
             f.write('\t\tnew google.maps.LatLng(%f, %f),\n' % (coordinate[0],coordinate[1]))
         f.write('\t];\n')
         f.write('\n')
-        
+
         f.write('\tvar lineSymbol = { \n')
         f.write('\t\tpath: google.maps.SymbolPath.FORWARD_CLOSED_ARROW \n')
         f.write('\t}; \n')
