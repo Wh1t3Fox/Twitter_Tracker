@@ -16,6 +16,7 @@ access_token_secret = ''
 gmap = pygmaps.maps('35.6500', '-97.4667', 5)
 
 #Coords for drawing our lines on the map
+user_enabled = False
 path = []
 legend = []
 
@@ -35,14 +36,15 @@ class Listener(tweepy.StreamListener):
         
         #If there coords, add them to the map
         if decoded['coordinates']:
-            #pop off the color in order to add more coords
-            try:
-                gmap.paths[0].pop(-1)
-            except:
-                pass
-            path.append((decoded['coordinates']['coordinates'][1], decoded['coordinates']['coordinates'][0]))
             gmap.addpoint(decoded['coordinates']['coordinates'][1], decoded['coordinates']['coordinates'][0], '#FF0000', "@"+decoded['user']['screen_name'])
-            gmap.addpath(path, "#0000FF")
+            if user_enabled:
+                #pop off the color in order to add more coords
+                try:
+                    gmap.paths[0].pop(-1)
+                except:
+                    pass
+                path.append((decoded['coordinates']['coordinates'][1], decoded['coordinates']['coordinates'][0]))
+                gmap.addpath(path, "#0000FF")
         
         return True
     
@@ -51,8 +53,8 @@ class Listener(tweepy.StreamListener):
         print status
         
     def draw_map(self):
-        thread = threading.Timer(30, self.draw_map)
-        thread.start()
+        self.thread = threading.Timer(30, self.draw_map)
+        self.thread.start()
         gmap.draw(legend)
 
 
@@ -69,6 +71,7 @@ if __name__ == "__main__":
         
         #If there are users to follow get their user id
         if args['user']:
+            user_enabled = True
             users = [str(tweepy.API(auth).get_user(x).id) for x in args['user']]
             [legend.append("@"+x) for x in args['user']]
         else:
@@ -85,7 +88,7 @@ if __name__ == "__main__":
         stream = tweepy.Stream(auth, l)
         stream.filter(follow=users, track=topics)
     except KeyboardInterrupt:
-        thread.cancel()
+        l.thread.cancel()
         print '\nGoodbye!'
     
     

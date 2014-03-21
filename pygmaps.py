@@ -34,10 +34,9 @@ class maps:
             self.drawmap(f)
             for point in  self.points:
                 self.drawpoint(f,point[0],point[1],point[2],point[3])
-            try:
+            if self.paths:
                 self.drawPolyline(f, self.paths)
-            except:
-                pass
+            f.write('\tmap.controls[google.maps.ControlPosition.LEFT_CENTER].push(legend);')
             f.write('}\n')        
     
     #Draw the map
@@ -89,5 +88,4 @@ class maps:
         f.write('\t});\n')
         f.write('\n')
         f.write('\tPath.setMap(map);\n')
-        f.write('\tmap.controls[google.maps.ControlPosition.LEFT_CENTER].push(legend);')
         f.write('\n\n')
