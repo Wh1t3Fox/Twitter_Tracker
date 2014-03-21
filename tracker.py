@@ -4,6 +4,7 @@ import pygmaps
 import tweepy
 import json
 import argparse
+import threading
 
 #Twitter Keys
 consumer_key = ''
@@ -20,6 +21,9 @@ legend = []
 
 #Listener to received the stream
 class Listener(tweepy.StreamListener):
+
+    def __init__(self):
+        self.draw_map()
     
     #Function is called on new tweet
     def on_data(self, data):
@@ -37,15 +41,20 @@ class Listener(tweepy.StreamListener):
             except:
                 pass
             path.append((decoded['coordinates']['coordinates'][1], decoded['coordinates']['coordinates'][0]))
-            gmap.addpoint(float(decoded['coordinates']['coordinates'][1]), float(decoded['coordinates']['coordinates'][0]), '#FF0000', "@"+decoded['user']['screen_name'])
+            gmap.addpoint(decoded['coordinates']['coordinates'][1], decoded['coordinates']['coordinates'][0], '#FF0000', "@"+decoded['user']['screen_name'])
             gmap.addpath(path, "#0000FF")
-            gmap.draw(legend)
         
         return True
     
     #If an error occurs
     def on_error(self, status):
         print status
+        
+    def draw_map(self):
+        thread = threading.Timer(30, self.draw_map)
+        thread.start()
+        gmap.draw(legend)
+
 
 
 if __name__ == "__main__":
@@ -76,6 +85,7 @@ if __name__ == "__main__":
         stream = tweepy.Stream(auth, l)
         stream.filter(follow=users, track=topics)
     except KeyboardInterrupt:
+        thread.cancel()
         print '\nGoodbye!'
     
     
