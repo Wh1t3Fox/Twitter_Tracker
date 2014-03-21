@@ -19,6 +19,6 @@ A Javascript file will be generated for the map using Google Maps API.
 
 ######Screenshot
 ![alt text](sampleImage.png "Sample Image")
- [View Site](https://secure.westcraig.com/tracker/ "Twitter Tracker")
+ [View Live Example](https://secure.westcraig.com/tracker/ "Twitter Tracker")
 
  NOTE: None of this information is stored at all.
