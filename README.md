@@ -8,7 +8,7 @@ A Javascript file will be generated for the map using Google Maps API.
 #Usage
     python tracker.py -u <usernames> -t <hashtags>
 <br>
-* You can specify either scren names, or hashtags to watch
+* You can specify either scren names, or hashtags(without the #) to watch
 <br>
 <br>
 
