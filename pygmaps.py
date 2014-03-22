@@ -29,7 +29,7 @@ class maps:
             f.write('var legend = document.getElementById("legend");')
             for item in legend:
                 f.write('var div = document.createElement("div");')
-                f.write('div.innerHTML = "<img src=\'%s\'> %s";' % (self.coloricon.replace('XXXXXX','FF0000'), item))
+                f.write('div.innerHTML = "<img src=\'{}\'> {}";'.format(self.coloricon.replace('XXXXXX','FF0000'), item))
                 f.write('legend.appendChild(div);')
             self.drawmap(f)
             for point in  self.points:
@@ -41,9 +41,9 @@ class maps:
     
     #Draw the map
     def drawmap(self, f):
-        f.write('var centerlatlng = new google.maps.LatLng(%f, %f);' % (self.center[0],self.center[1]))
+        f.write('var centerlatlng = new google.maps.LatLng({}, {});'.format(self.center[0],self.center[1]))
         f.write('var myOptions = {')
-        f.write('zoom: %d,' % (self.zoom))
+        f.write('zoom: {},'.format(self.zoom))
         f.write('center: centerlatlng,')
         f.write('mapTypeId: google.maps.MapTypeId.ROADMAP')
         f.write('};')
@@ -52,11 +52,11 @@ class maps:
     
     #Add the points to the map
     def drawpoint(self,f,lat,lon,color,title):
-        f.write('var latlng = new google.maps.LatLng(%f, %f);'%(lat,lon))
-        f.write('var img = new google.maps.MarkerImage(\'%s\');' % (self.coloricon.replace('XXXXXX',color)))
+        f.write('var latlng = new google.maps.LatLng({}, {});'.format(lat,lon))
+        f.write('var img = new google.maps.MarkerImage(\'{}\');'.format(self.coloricon.replace('XXXXXX',color)))
         f.write('var marker = new google.maps.Marker({')
         if title !=None:
-            f.write('title: "'+str(title)+'",')
+            f.write('title: "{}",'.format(str(title)))
         f.write('icon: img,')
         f.write('position: latlng')
         f.write('});')
@@ -66,19 +66,19 @@ class maps:
     def drawPolyline(self,f,path, clickable = False, geodesic = True,strokeColor = "#0000FF",strokeOpacity = 1.0, strokeWeight = 2):
         f.write('var PolylineCoordinates = [')
         for coordinate in path[0][:-1]:
-            f.write('new google.maps.LatLng(%f, %f),' % (coordinate[0],coordinate[1]))
+            f.write('new google.maps.LatLng({}, {}),'.format(coordinate[0],coordinate[1]))
         f.write('];')
         f.write('var lineSymbol = {path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW};')
         f.write('var Path = new google.maps.Polyline({')
-        f.write('clickable: %s,' % (str(clickable).lower()))
-        f.write('geodesic: %s,' % (str(geodesic).lower()))
+        f.write('clickable: {},'.format(str(clickable).lower()))
+        f.write('geodesic: {},'.format(str(geodesic).lower()))
         f.write('path: PolylineCoordinates,')
         f.write('icons: [{')
         f.write('icon: lineSymbol,')
         f.write('offset: "100%"')
         f.write('}],')
-        f.write('strokeColor: "%s",' %(strokeColor))
-        f.write('strokeOpacity: %f,' % (strokeOpacity))
-        f.write('strokeWeight: %d' % (strokeWeight))
+        f.write('strokeColor: "{}",'.format(strokeColor))
+        f.write('strokeOpacity: {},'.format(strokeOpacity))
+        f.write('strokeWeight: {}'.format(strokeWeight))
         f.write('});')
         f.write('Path.setMap(map);')

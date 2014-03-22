@@ -19,6 +19,7 @@ gmap = pygmaps.maps('35.6500', '-97.4667', 5)
 user_enabled = False
 path = []
 legend = []
+colors = []
 
 #Listener to received the stream
 class Listener(tweepy.StreamListener):
@@ -31,12 +32,13 @@ class Listener(tweepy.StreamListener):
         decoded = json.loads(data)
         
         #Print the tweet
-        print '@%s: %s' % (decoded['user']['screen_name'], decoded['text'].encode('ascii', 'ignore'))
-        print ''
+        print('@{}: {}'.format(decoded['user']['screen_name'], decoded['text'].encode('ascii', 'ignore')))
+        print('')
         
         #If there coords, add them to the map
         if decoded['coordinates']:
-            gmap.addpoint(decoded['coordinates']['coordinates'][1], decoded['coordinates']['coordinates'][0], '#FF0000', "@"+decoded['user']['screen_name'])
+            title = "@"+decoded['user']['screen_name']
+            gmap.addpoint(decoded['coordinates']['coordinates'][1], decoded['coordinates']['coordinates'][0], '#FF0000', title)
             if user_enabled:
                 #pop off the color in order to add more coords
                 try:
@@ -50,7 +52,7 @@ class Listener(tweepy.StreamListener):
     
     #If an error occurs
     def on_error(self, status):
-        print status
+        print(status)
         
     def draw_map(self):
         self.thread = threading.Timer(30, self.draw_map)
@@ -89,6 +91,6 @@ if __name__ == "__main__":
         stream.filter(follow=users, track=topics)
     except KeyboardInterrupt:
         l.thread.cancel()
-        print '\nGoodbye!'
+        print('\nGoodbye!')
     
     
