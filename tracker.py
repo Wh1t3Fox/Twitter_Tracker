@@ -33,12 +33,13 @@ class Listener(tweepy.StreamListener):
     def on_data(self, data):
         decoded = json.loads(data)
 
-        #Print the tweet
-        print('@{}: {}'.format(decoded['user']['screen_name'], decoded['text'].encode('ascii', 'ignore')))
-        print('')
-
         #If there coords, add them to the map
         if decoded['coordinates']:
+
+            #Print the tweet
+            #print('@{}: {}'.format(decoded['user']['screen_name'], decoded['text'].encode('ascii', 'ignore')))
+            #print('')
+
             title = "@"+decoded['user']['screen_name']
             gmap.addpoint(decoded['coordinates']['coordinates'][1], decoded['coordinates']['coordinates'][0], '#FF0000', title)
             if user_enabled:

@@ -27,7 +27,7 @@ class maps:
         with open('public/js/map.js','w') as f:
             f.write('function initialize() {')
             f.write('var legend = document.getElementById("legend");')
-            for item in legend:
+            for item in set(legend):
                 f.write('var div = document.createElement("div");')
                 f.write('div.innerHTML = "<img src=\'{}\'> {}";'.format(self.coloricon.replace('XXXXXX','FF0000'), item))
                 f.write('legend.appendChild(div);')
