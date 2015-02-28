@@ -10,6 +10,9 @@ from random import random
 import cherrypy
 import threading
 import os
+import sys
+
+l = None
 
 class Server(object):
 
@@ -19,7 +22,7 @@ class Server(object):
         global users
         global topics
         global legend
-        global t
+
         if user:
             user_enabled = True
             users = [str(tweepy.API(auth).get_user(x).id) for x in user.split(',')]
@@ -32,13 +35,10 @@ class Server(object):
         else:
             topics = []
 
-        def tweet():
-            l = Listener()
-            stream = tweepy.Stream(auth, l)
-            stream.filter(follow=users, track=topics)
 
-        t = threading.Thread(target=tweet)
-        t.start()
+        l = Listener()
+        stream = tweepy.Stream(auth, l)
+        stream.filter(follow=users, track=topics, async=True)
 
         tmpl = env.get_template('index.html')
         return tmpl.render(rand=random())
@@ -55,5 +55,8 @@ if __name__ == '__main__':
             'tools.staticdir.dir': './public'
         }
     }
-
-    cherrypy.quickstart(Server(), '/', conf)
+    try:
+        cherrypy.quickstart(Server(), '/', conf)
+    except KeyboardInterrupt:
+        l.thread.cancel()
+        sys.exit()
