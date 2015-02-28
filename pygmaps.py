@@ -16,15 +16,15 @@ class maps:
     #Add a point to the list
     def addpoint(self, lat, lng, color = '#FF0000', title = None):
         self.points.append((lat,lng,color[1:],title))
-    
+
     #Add a list of points to the path list
     def addpath(self,path,color = '#FF0000'):
         path.append(color)
         self.paths.append(path)
-    
+
     #Create the file
     def draw(self, legend):
-        with open('map.js','w') as f:
+        with open('public/js/map.js','w') as f:
             f.write('function initialize() {')
             f.write('var legend = document.getElementById("legend");')
             for item in legend:
@@ -37,8 +37,8 @@ class maps:
             if self.paths:
                 self.drawPolyline(f, self.paths)
             f.write('map.controls[google.maps.ControlPosition.LEFT_CENTER].push(legend);')
-            f.write('}')        
-    
+            f.write('}')
+
     #Draw the map
     def drawmap(self, f):
         f.write('var centerlatlng = new google.maps.LatLng({}, {});'.format(self.center[0],self.center[1]))
@@ -49,7 +49,7 @@ class maps:
         f.write('};')
         f.write('var map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);')
         f.write('')
-    
+
     #Add the points to the map
     def drawpoint(self,f,lat,lon,color,title):
         f.write('var latlng = new google.maps.LatLng({}, {});'.format(lat,lon))
@@ -61,7 +61,7 @@ class maps:
         f.write('position: latlng')
         f.write('});')
         f.write('marker.setMap(map);')
-        
+
     #Add the line between points
     def drawPolyline(self,f,path, clickable = False, geodesic = True,strokeColor = "#0000FF",strokeOpacity = 1.0, strokeWeight = 2):
         f.write('var PolylineCoordinates = [')

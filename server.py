@@ -1,37 +1,43 @@
-import cherrypy
+#!/usr/bin/env python
+"""
+Twitter Tracker
+Author: Craig West
+"""
+from jinja2 import Environment, FileSystemLoader
+env = Environment(loader=FileSystemLoader('templates'))
+from tracker import *
+from pygmaps import maps
 from random import random
+import cherrypy
 import os
 
 
 class Server(object):
 
     @cherrypy.expose
-    def index(self):
-        return """
-<html>
-<head>
-    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
-    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
-    <title>Twitter Tracker</title>
-    <link href="/static/css/style.css" rel="stylesheet" />
-    <script type="text/javascript" src="/static/js/jsrefresh.js#js,notify"></script>
-    <script type="text/javascript" src="/static/js/map.js?%(RAND)s"></script>
-    <script type="text/javascript">
-        function loadScript() {
-          var script = document.createElement('script');
-          script.type = 'text/javascript';
-          script.src = 'https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&' +
-              'callback=initialize';
-          document.body.appendChild(script);
-        }
-        window.onload = loadScript;
-    </script>
-</head>
-    <body>
-    	<div id="map_canvas"></div>
-    </body>
-</html>
-    """ % {'RAND' : random()}
+    def index(self, user=None, hashtag=None):
+        global user_enabled
+        global users
+        global topics
+        global legend
+        if user:
+            user_enabled = True
+            users = [str(tweepy.API(auth).get_user(x).id) for x in args['user']]
+            [legend.append("@"+x) for x in args['user']]
+        else:
+            users = []
+        if hashtag:
+            topics = [x for x in args['topic']]
+            [legend.append("#"+x) for x in args['topic']]
+        else:
+            topics = []
+
+        #l = Listener()
+        #stream = tweepy.Stream(auth, l)
+        #stream.filter(follow=users, track=topics)
+        tmpl = env.get_template('index.html')
+        return tmpl.render(rand=random())
+
 
 if __name__ == '__main__':
     conf = {
