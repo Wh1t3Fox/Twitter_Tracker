@@ -32,11 +32,13 @@ class Server(object):
         else:
             topics = []
 
+        def tweet():
+            l = Listener()
+            stream = tweepy.Stream(auth, l)
+            stream.filter(follow=users, track=topics)
 
-        #l = Listener()
-        #stream = tweepy.Stream(auth, l)
-        #stream.filter(follow=users, track=topics)
-
+        t = threading.Thread(target=tweet)
+        t.start()
 
         tmpl = env.get_template('index.html')
         return tmpl.render(rand=random())
