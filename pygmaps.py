@@ -6,7 +6,7 @@
 
 class maps:
 
-    def __init__(self, centerLat, centerLng, zoom ):
+    def __init__(self, centerLat='35.6500', centerLng='-97.4667', zoom=5 ):
         self.center = (float(centerLat),float(centerLng))
         self.zoom = int(zoom)
         self.paths = []
