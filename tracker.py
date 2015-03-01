@@ -2,11 +2,13 @@
 
 from tweepy import OAuthHandler
 from ConfigParser import SafeConfigParser
+from server import CSRF
 import tweepy
 import pygmaps
 import json
 import argparse
 import threading
+import requests
 
 
 parser = SafeConfigParser()
@@ -15,7 +17,7 @@ auth= OAuthHandler(parser.get('twitter', 'CONSUMER_KEY'), parser.get('twitter', 
 auth.set_access_token(parser.get('twitter', 'ACCESS_KEY'),parser.get('twitter', 'ACCESS_SECRET'))
 
 #Initialize the map
-gmap = pygmaps.maps('35.6500', '-97.4667', 5)
+gmap = pygmaps.maps()
 
 #Coords for drawing our lines on the map
 user_enabled = False
@@ -39,7 +41,12 @@ class Listener(tweepy.StreamListener):
             #Print the tweet
             #print('@{}: {}'.format(decoded['user']['screen_name'], decoded['text'].encode('ascii', 'ignore')))
             #print('')
-
+            payload = {}
+            payload['data'] = {}
+            payload['data']['CSRF_token'] = CSRF
+            payload['data']['user'] = "@"+decoded['user']['screen_name']
+            r = requests.post('http://localhost:8080/request', params=payload)
+            '''
             title = "@"+decoded['user']['screen_name']
             gmap.addpoint(decoded['coordinates']['coordinates'][1], decoded['coordinates']['coordinates'][0], '#FF0000', title)
             if user_enabled:
@@ -50,45 +57,15 @@ class Listener(tweepy.StreamListener):
                     pass
                 path.append((decoded['coordinates']['coordinates'][1], decoded['coordinates']['coordinates'][0]))
                 gmap.addpath(path, "#0000FF")
-
+            '''
         return True
 
     #If an error occurs
     def on_error(self, status):
-        print(status)
+        pass
+        #print("[-] ERROR {0}".format(status))
 
     def draw_map(self):
         self.thread = threading.Timer(30, self.draw_map)
         self.thread.start()
         gmap.draw(legend)
-
-
-
-if __name__ == "__main__":
-    try:
-        parser = argparse.ArgumentParser(description="Track a User or Topic with GPS")
-        parser.add_argument('-u', '--user', nargs='+', type=str, help="Twitter username")
-        parser.add_argument('-t', '--topic', nargs='+', type=str, help="Hashtags to follow")
-        args = vars(parser.parse_args())
-
-        #If there are users to follow get their user id
-        if args['user']:
-            user_enabled = True
-            users = [str(tweepy.API(auth).get_user(x).id) for x in args['user']]
-            [legend.append("@"+x) for x in args['user']]
-        else:
-            users = []
-        if args['topic']:
-            topics = [x for x in args['topic']]
-            [legend.append("#"+x) for x in args['topic']]
-        else:
-            topics = []
-
-
-        #Setup the stream with the arguments
-        l = Listener()
-        stream = tweepy.Stream(auth, l)
-        stream.filter(follow=users, track=topics)
-    except KeyboardInterrupt:
-        l.thread.cancel()
-        print('\nGoodbye!')
