@@ -22,3 +22,9 @@ A Javascript file will be generated for the map using Google Maps API.
 
 ######Screenshot
 ![alt text](sampleImage.png "Sample Image")
+
+
+
+.. |build-status| image:: https://travis-ci.org/cawest1221/Twitter_Tracker.svg?branch=master
+   :target: https://travis-ci.org/cawest1221/Twitter_Tracker
+   :alt: Build status
