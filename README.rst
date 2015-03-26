@@ -1,5 +1,5 @@
-Twitter Tracker  
-=========
+Twitter Tracker |build-status|
+==============================
 
 A program to capture GPS coordinates from tweets and plot them on a map.
 
