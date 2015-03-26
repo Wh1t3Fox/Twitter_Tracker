@@ -5,7 +5,8 @@ A program to capture GPS coordinates from tweets and plot them on a map.
 
 A Javascript file will be generated for the map using Google Maps API.
 
-#Usage
+Usage
+
     python server.py
 
 * You can specify either scren names, or hashtags(without the #) to watch
